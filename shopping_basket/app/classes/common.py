@@ -1,0 +1,2 @@
+class BasketPricerException(Exception):
+    pass
