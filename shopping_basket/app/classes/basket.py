@@ -41,7 +41,7 @@ class Basket:
 
 
 class ListOfDictBasketAdapter(Basket):
-    """ This adapter allows baskets in form of List of Dicts be used in BasketPricer.
+    """This adapter allows baskets in form of List of Dicts be used in BasketPricer.
     Adapter just as an example - similar one could be used as adapter to any format, such as
     DB connectors, API connect, other format converters, etc."""
 

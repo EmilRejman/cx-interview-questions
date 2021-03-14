@@ -36,6 +36,7 @@ def test_percent_discount(number_of_items):
 
     assert SUT.discount == number_of_items * price * discount / 100
 
+
 def test_percent_discount_multiple_times_total_price_cant_be_lower_than_zero():
     price = 1.0
     basket = Basket([["shampoo", 1]])
@@ -47,8 +48,10 @@ def test_percent_discount_multiple_times_total_price_cant_be_lower_than_zero():
     assert SUT.total == 0.0
 
 
-@pytest.mark.parametrize("number_of_items, x, y, expected_discounted_products",
-                         [(2, 2, 2, 0), (4, 2, 2, 2), (3, 2, 2, 1), (8, 2, 2, 4), (11, 2, 2, 5)])
+@pytest.mark.parametrize(
+    "number_of_items, x, y, expected_discounted_products",
+    [(2, 2, 2, 0), (4, 2, 2, 2), (3, 2, 2, 1), (8, 2, 2, 4), (11, 2, 2, 5)],
+)
 def test_buy_x_get_y_free_discount(number_of_items, x, y, expected_discounted_products):
     price = 1.0
     basket = Basket([["shampoo", number_of_items]])
@@ -74,8 +77,10 @@ def test_buy_x_get_y_free_exceptions(x, y):
         SUT.discount
 
 
-@pytest.mark.parametrize("number_of_items, x, y, expected_discounted_products",
-                         [(2, 4, 2, 0), (3, 4, 2, 0), (4, 4, 2, 2), (8, 4, 2, 4), (11, 4, 2, 4)])
+@pytest.mark.parametrize(
+    "number_of_items, x, y, expected_discounted_products",
+    [(2, 4, 2, 0), (3, 4, 2, 0), (4, 4, 2, 2), (8, 4, 2, 4), (11, 4, 2, 4)],
+)
 def test_buy_x_for_price_of_y_discount(number_of_items, x, y, expected_discounted_products):
     price = 1.0
     basket = Basket([["shampoo", number_of_items]])
