@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 from app.classes.common import BasketPricerException
 
 
@@ -38,3 +38,18 @@ class Basket:
 
     def __str__(self):
         return f"Basket products: {[str(product) for product in self.product_list]}"
+
+
+class ListOfDictBasketAdapter(Basket):
+    """ This adapter allows baskets in form of List of Dicts be used in BasketPricer.
+    Adapter just as an example - similar one could be used as adapter to any format, such as
+    DB connectors, API connect, other format converters, etc."""
+
+    def __init__(self, iterable: List[Dict]):
+        correct_iterable = self._convert_list_of_dict_to_list_of_list(iterable)
+        super().__init__(correct_iterable)
+
+    @staticmethod
+    def _convert_list_of_dict_to_list_of_list(iterable: List[Dict]):
+        """ fcn converts list of dict to Basket target init format """
+        return [[el["id"], el["quantity"]] for el in iterable]
