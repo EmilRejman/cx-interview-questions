@@ -72,3 +72,41 @@ def test_buy_x_get_y_free_exceptions(x, y):
 
     with pytest.raises(BasketPricerException):
         SUT.discount
+
+
+@pytest.mark.parametrize("number_of_items, x, y, expected_discounted_products",
+                         [(2, 4, 2, 0), (3, 4, 2, 0), (4, 4, 2, 2), (8, 4, 2, 4), (11, 4, 2, 4)])
+def test_buy_x_for_price_of_y_discount(number_of_items, x, y, expected_discounted_products):
+    price = 1.0
+    basket = Basket([["shampoo", number_of_items]])
+    catalogue = Catalogue([["shampoo", price]])
+    offers = Offers([["shampoo", "buy_x_for_price_of_y", {"buy": x, "price_of": y}]])
+
+    SUT = BasketPricer(basket=basket, catalogue=catalogue, offers=offers)
+
+    expected_discount = expected_discounted_products * price
+    assert SUT.discount == expected_discount
+
+
+@pytest.mark.parametrize("x, y", [(0, 1), (1, 0), (-1, 1), (1, -1), (2, 2), (2, 3)])
+def test_buy_x_for_price_of_y_exceptions(x, y):
+    price = 1.0
+    basket = Basket([["shampoo", 1]])
+    catalogue = Catalogue([["shampoo", price]])
+    offers = Offers([["shampoo", "buy_x_for_price_of_y", {"buy": x, "price_of": y}]])
+
+    SUT = BasketPricer(basket=basket, catalogue=catalogue, offers=offers)
+
+    with pytest.raises(BasketPricerException):
+        SUT.discount
+
+
+def test_multiple_offers_on_the_same_items_are_all_applied():
+    """ discount is counted for all offers without any additional logic """
+    basket = Basket([["shampoo", 2]])
+    catalogue = Catalogue([["shampoo", 1.0]])
+    offers = Offers([["shampoo", "percent", 50], ["shampoo", "buy_x_get_y_free", {"buy": 1, "free": 1}]])
+
+    SUT = BasketPricer(basket=basket, catalogue=catalogue, offers=offers)
+
+    assert SUT.discount == 2.0

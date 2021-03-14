@@ -52,7 +52,8 @@ class BasketPricer:
         discounts """
         discount_types = {
             "percent": self._count_discount_percent,
-            "buy_x_get_y_free": self._count_discount_buy_x_get_y_free
+            "buy_x_get_y_free": self._count_discount_buy_x_get_y_free,
+            "buy_x_for_price_of_y": self._count_discount_buy_x_for_price_of_y
         }
 
         return discount_types[discount_type](*args)
@@ -76,5 +77,20 @@ class BasketPricer:
         remaining_discount_quantity = remaining_products_quantity - discount.discount_data["buy"]
         if remaining_discount_quantity > 0:
             total_discount += remaining_discount_quantity * product_price
+
+        return total_discount
+
+    @staticmethod
+    def _count_discount_buy_x_for_price_of_y(product_and_quantity, product_price, discount):
+        if discount.discount_data["buy"] <= 0 or discount.discount_data["price_of"] <= 0 or \
+                discount.discount_data["price_of"] >= discount.discount_data["buy"]:
+            raise BasketPricerException(f"Discount for {discount.product_id} of type {discount.type} has not "
+                                        f"correct discount data: {discount.discount_data}")
+        total_discount = 0.0
+        full_discounts, _ = divmod(product_and_quantity.quantity, discount.discount_data["buy"])
+
+        # get discount value form full_discounts
+        free_products_per_discount = discount.discount_data["buy"] - discount.discount_data["price_of"]
+        total_discount += full_discounts * free_products_per_discount * product_price
 
         return total_discount
