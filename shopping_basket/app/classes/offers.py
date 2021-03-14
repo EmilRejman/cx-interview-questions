@@ -20,4 +20,4 @@ class Offers:
         return iter(self.offers_list)
 
     def __str__(self):
-        return f"Basket products: {[str(discount) for discount in self.offers_list]}"
+        return f"Product discounts: {[str(discount) for discount in self.offers_list]}"
