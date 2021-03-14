@@ -45,3 +45,30 @@ def test_percent_discount_multiple_times_total_price_cant_be_lower_than_zero():
     SUT = BasketPricer(basket=basket, catalogue=catalogue, offers=offers)
 
     assert SUT.total == 0.0
+
+
+@pytest.mark.parametrize("number_of_items, x, y, expected_discounted_products",
+                         [(2, 2, 2, 0), (4, 2, 2, 2), (3, 2, 2, 1), (8, 2, 2, 4), (11, 2, 2, 5)])
+def test_buy_x_get_y_free_discount(number_of_items, x, y, expected_discounted_products):
+    price = 1.0
+    basket = Basket([["shampoo", number_of_items]])
+    catalogue = Catalogue([["shampoo", price]])
+    offers = Offers([["shampoo", "buy_x_get_y_free", {"buy": x, "free": y}]])
+
+    SUT = BasketPricer(basket=basket, catalogue=catalogue, offers=offers)
+
+    expected_discount = expected_discounted_products * price
+    assert SUT.discount == expected_discount
+
+
+@pytest.mark.parametrize("x, y", [(0, 1), (1, 0), (-1, 1), (1, -1)])
+def test_buy_x_get_y_free_exceptions(x, y):
+    price = 1.0
+    basket = Basket([["shampoo", 1]])
+    catalogue = Catalogue([["shampoo", price]])
+    offers = Offers([["shampoo", "buy_x_get_y_free", {"buy": x, "free": y}]])
+
+    SUT = BasketPricer(basket=basket, catalogue=catalogue, offers=offers)
+
+    with pytest.raises(BasketPricerException):
+        SUT.discount

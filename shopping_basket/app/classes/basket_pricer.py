@@ -51,7 +51,8 @@ class BasketPricer:
         point of this task, so I left counting multiple offers in the simplest way (without looking at other
         discounts """
         discount_types = {
-            "percent": self._count_discount_percent
+            "percent": self._count_discount_percent,
+            "buy_x_get_y_free": self._count_discount_buy_x_get_y_free
         }
 
         return discount_types[discount_type](*args)
@@ -59,3 +60,21 @@ class BasketPricer:
     @staticmethod
     def _count_discount_percent(product_and_quantity, product_price, discount):
         return product_and_quantity.quantity * product_price * discount.discount_data / 100.0
+
+    @staticmethod
+    def _count_discount_buy_x_get_y_free(product_and_quantity, product_price, discount):
+        if discount.discount_data["buy"] <= 0 or discount.discount_data["free"] <= 0:
+            raise BasketPricerException(f"Discount has incorrect data: {discount}")
+        total_discount = 0.0
+        buy_plus_free = discount.discount_data["buy"] + discount.discount_data["free"]
+        full_discounts, remaining_products_quantity = divmod(product_and_quantity.quantity,
+                                                             buy_plus_free)
+        # get discount value form full_discounts
+        total_discount += full_discounts * discount.discount_data["free"] * product_price
+
+        # get discount from remaining products if applicable
+        remaining_discount_quantity = remaining_products_quantity - discount.discount_data["buy"]
+        if remaining_discount_quantity > 0:
+            total_discount += remaining_discount_quantity * product_price
+
+        return total_discount
